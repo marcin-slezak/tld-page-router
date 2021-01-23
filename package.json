@@ -1,0 +1,18 @@
+{
+  "name": "tdl-page-router",
+  "version": "1.0.0",
+  "description": "Library that helps implementing web application with language and localisation support. We follow TLD + /cc-lang/ + translated path",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test-watch": "jest --watchAll"
+  },
+  "author": "Marcin Slezak",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "babel-jest": "^26.6.3",
+    "jest": "^26.6.3"
+  }
+}
