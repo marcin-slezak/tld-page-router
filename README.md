@@ -6,6 +6,7 @@ Library that helps implementing inetrnalization for expressJs routing following 
 - we should be able to switch between old and urls's schema really quickly (config switch)
 - new url schema:
 
+```
 example.com/nl-en/subscription   ]---> url
      |        |       |
      |        |       |____ path
@@ -13,13 +14,14 @@ example.com/nl-en/subscription   ]---> url
      |        |___ path prefix that contain country code and short language code (also know as `localisation prefix`) 
      |
      |_____________  domain
+```
 
 Features:
 - manage country and language configuration
-- manage language specific url for one page
+- manage language specific urls for one page
 - simple integration with expressJS router
 - simple integration with sitemap.xml library
-- front and backend
+- working on frontend and backend
 
 
 Example configuration
@@ -76,112 +78,76 @@ export default tdllr;
 ```
 
 
-How we should be able define pages:
+How we should be able define pages urls:
 - the same path for all countries and langs
-- different paths per language
-- page enabled only for some country
-- page enabled only for somelanguages
-- page enabled only for some country-lang sets
-- use regexp
-
-
-Netherlands:
-    - dutch
-    - english
-Germany:
-    - German
-    - English
-
+- path for country
+- path for languages
+- path for localisation prefixes
 
 
 ```js
 import tdllr from './tdllr';
 
-// the same url for all countries/langs
+// set the same path for all countries and langs
 tdllr.addPage('HOME').addPath('/');
 tdllr.addPage('FAQ').addPath('/faq');
 
-// the same url per country
-tdllr.addPage('OUR_CAPITAL').addPathForCountry('de', 'Berlin').urlForCountry('de', 'Amsterdam');
+// set path for country
+tdllr.addPage('OUR_CAPITAL')
+  .addPathForCountry('de', 'Berlin')
+  .addPathForCountry('nl', 'Amsterdam');
 
+// set path for languages
+tdllr.addPage('SUBSCRIPTIONS')
+  .addPathForLanguage({
+      nl: '/abonamennten',
+      pl: '/subskrypcje',
+      en: '/subscriptions'
+  });
 
-tdllr.addPage('SUBSCRIPTIONS').addPathForLanguage({nl: '/abonamennten', pl: '/subskrypcje', en: '/subscriptions'})
-
-
-tdllr.addPage('CONTACT').addPathForLocalisationPrefixex({
+// set path for localisation prefixes
+tdllr.addPage('CONTACT')
+  .addPathForLocalisationPrefixes({
     'nl-nl': '/abonamennten',
     'pl-pl': '/subskrypcje',
     'nl-en': '/subscriptions'
-    })
-
-
-
-
-
+  });
 
 ```
 
 
-
-
-
-
-Adn way how we can query data that we need
+And the most important part, queries! We should provide methods that will give us simple way
+to get all data that we need, in one common schema.
 
 ```js
 import tdllr from './tdllr';
 
+// Query to get available urls that can be reused directly by expressJS routing
 tdllr.getPage('SUBSCRIPTIONS').getRouting()
-// ['/nl-nl/abonamennten', '/nl-en/subscriptions', '/pl-pl/subskrypcje']
+// Result:
+//   [
+//     '/nl-nl/abonamennten',
+//     '/nl-en/subscriptions',
+//     '/pl-pl/subskrypcje'
+//   ]
 
+// Query toget all urls for specific page
 tdllr.getPage('SUBSCRIPTIONS').getDefinition()
+// Results:
 // [{
+//     url: '/de-de/abonnement',
 //     localisationPrefix: 'de-de',
-//     language: lang
-//     country: country
-//     url: '/de-de/abonnement'
-// }];
-tdllr.getPage('SUBSCRIPTIONS').getAlternativePagesFor('de')
-// [{
-//     localisationPrefix: 'de-de',
-//     language: lang
-//     country: country
-//     url: '/de-de/abonnement'
+//     language: {shortCode: 'de', longCode: 'de-de'},
+//     country: {code: 'de', name: 'Germany'}
 // }];
 
-tdllr.getEnabledLangs()
-tdllr.getEnabledLangsShortCodes()
-tdllr.getAllLangsCodes()
-tdllr.getAllLangsShortCodes()
+// Query to get all alternative url for specific page, useful to widget where you allow
+// to switch between languages
+tdllr.getPage('SUBSCRIPTIONS').getAlternativePagesFor('country': 'de', lang: 'de');
 
-
-tdllr.getLangNadCountryByLocalisationPrefix('nl-en')
-// {
-//     language: {},
-//     country: {},
-// }
-
-tdllr.getEnabledLanguagesAvailbeForCountry('de')
-// [
-//     lang1,
-//     lang 2
-// ]
-
-
+// Other queries:
 
 ```
 
 
-Middle ware to set locale
-
-
-```js
-
-app.use(tdllr.setLocale)
-
-res.locale.lang = {LANG}
-res.locale.country = {COUNTRY}
-res.locale.localisation_prefix = 'nl-nl'
-
-
-```
+Library provide middleware for expressJS that will allow to detect lang and country from url. Lang and country attributes in res.locals will contain complete config objects.
