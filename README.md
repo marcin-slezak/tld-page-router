@@ -1,4 +1,4 @@
-Library that helps implementing inetrnalization for expressJs routing following Geberal Top Level Domain (gTLD). It's not a universal library but a tool that fits into specific case:
+Library that helps implementing inetrnalization for expressJs routing following Global Top Level Domain (gTLD). It's not a universal library but a tool that fits into specific case:
 
 - we have a web application that was implemented for one country using Country Coude Top Level Domain (ccTLD)
 - web application is going global so we need to prepare for new countries and languages
